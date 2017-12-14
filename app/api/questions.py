@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from app.models import Question
+from app.models import Question, serialize
 from app.app import db
 
 questions_blueprint = Blueprint('questions', __name__)
@@ -10,7 +10,15 @@ def get_questions():
     if request.method == 'POST':
         return post_question()
 
-    return "Hello"
+    questions = Question.query.paginate()
+    return jsonify({
+        'page': questions.page,
+        'pages': questions.pages,
+        'per_page': questions.per_page,
+        'next': questions.next_num,
+        'prev': questions.prev_num,
+        'questions': [serialize(question) for question in questions.items]
+    })
 
 
 @questions_blueprint.route('', methods=['POST'])
