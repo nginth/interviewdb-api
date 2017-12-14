@@ -14,6 +14,6 @@ def create_app(config='config.json'):
         db.create_all()
 
     from .api.questions import questions_blueprint
-    app.register_blueprint(questions_blueprint, url_prefix="/questions")
+    app.register_blueprint(questions_blueprint, url_prefix="/question")
 
     return app

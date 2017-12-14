@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from app.models import Question, serialize
 from app.app import db
 
-questions_blueprint = Blueprint('questions', __name__)
+questions_blueprint = Blueprint('question', __name__)
 
 
 @questions_blueprint.route('', methods=['GET'])
@@ -21,6 +21,16 @@ def get_questions():
     })
 
 
+@questions_blueprint.route('/<int:question_id>', methods=['GET'])
+def get_question_specific(question_id):
+    question = Question.query.filter(Question.id == question_id).first()
+    if not question:
+        response = jsonify({'message': 'Not found.'})
+        response.status_code = 404
+        return response
+    return jsonify(serialize(question))
+
+
 @questions_blueprint.route('', methods=['POST'])
 def post_question():
     try:
@@ -33,7 +43,7 @@ def post_question():
     except KeyError as err:
         print(err.args)
         response = jsonify(
-            {'message': 'Bad request. Request must contain field: ' + err.args[0] + '.', 'status_code': 400})
+            {'message': 'Bad request. Request must contain field: ' + err.args[0] + '.'})
         response.status_code = 400
         return response
 
