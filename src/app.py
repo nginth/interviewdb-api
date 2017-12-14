@@ -1,4 +1,4 @@
-from Flask import flask
+from flask import Flask
 
 
 def create_app(config='config.json'):
