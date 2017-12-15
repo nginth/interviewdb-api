@@ -41,4 +41,9 @@ def question_from_json(json):
     question.name = json['name']
     question.content = json['content']
     question.answer = json['answer'] if 'answer' in json else None
+    question.categories = categories_from_json(json['categories'])
     return question
+
+
+def categories_from_json(categories):
+    return Category.query.filter(Category.name.in_(categories)).all()
