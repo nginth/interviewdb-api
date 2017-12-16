@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from app.models import Question, serialize
+from app.models import Question, Category
 from app.app import db
 from .util import all_response, specific_response
 
