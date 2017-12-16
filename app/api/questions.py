@@ -11,7 +11,7 @@ def get_questions():
     if request.method == 'POST':
         return post_question()
 
-    return all_response(Question)
+    return all_response(Question, 'questions')
 
 
 @questions_blueprint.route('/<int:question_id>', methods=['GET'])

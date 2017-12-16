@@ -2,7 +2,7 @@ from flask import jsonify
 from app.models import serialize
 
 
-def all_response(model):
+def all_response(model, model_name):
     models = model.query.paginate()
     return jsonify({
         'page': models.page,
@@ -10,7 +10,7 @@ def all_response(model):
         'per_page': models.per_page,
         'next': models.next_num,
         'prev': models.prev_num,
-        'questions': [serialize(model) for model in models.items]
+        model_name: [serialize(model) for model in models.items]
     })
 
 

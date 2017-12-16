@@ -12,7 +12,7 @@ def get_categories():
     if request.method == 'POST':
         return post_question()
 
-    return all_response(Category)
+    return all_response(Category, 'categories')
 
 
 @categories_blueprint.route('/<string:category_name>', methods=['GET'])
