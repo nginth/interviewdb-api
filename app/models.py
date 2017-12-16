@@ -13,17 +13,63 @@ class Question(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.UnicodeText, nullable=False)
     content = db.Column(db.UnicodeText, nullable=False)
-    answer = db.Column(db.UnicodeText)
     categories = db.relationship(
         'Category', secondary=questions_categories, backref='questions')
+    hints = db.relationship('Hint')
+    answers = db.relationship('Answer')
 
     def __serialize__(self):
         return {
             'id': self.id,
             'name': self.name,
             'content': self.content,
-            'answer': self.answer,
-            'categories': [category.name for category in self.categories]
+            'categories': [category.name for category in self.categories],
+            'hints': [{'id': hint.id, 'content': hint.content} for hint in self.hints],
+            'answers': [{'id': answer.id, 'content': answer.content} for answer in self.answers]
+        }
+
+
+class Category(db.Model):
+    __tablename__ = 'category'
+    name = db.Column(db.UnicodeText, primary_key=True)
+
+    def __serialize__(self):
+        return {
+            'name': self.name
+        }
+
+
+class Answer(db.Model):
+    __tablename__ = 'answer'
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.UnicodeText, nullable=False)
+    question_id = db.Column(db.Integer, db.ForeignKey('question.id'))
+
+    def __serialize__(self):
+        return {
+            'id': self.id,
+            'content': self.content,
+            'question': self.question_id
+        }
+
+
+# class Language(db.Model):
+#     __tablename__ = 'language'
+
+
+class Hint(db.Model):
+    __tablename__ = 'hint'
+    id = db.Column(db.Integer, primary_key=True)
+    order = db.Column(db.Integer, nullable=False)
+    content = db.Column(db.UnicodeText, nullable=False)
+    question_id = db.Column(db.Integer, db.ForeignKey('question.id'))
+
+    def __serialize__(self):
+        return {
+            'id': self.id,
+            'order': self.order,
+            'content': self.content,
+            'question': self.question_id
         }
 
 
@@ -35,13 +81,3 @@ def serialize(obj):
         raise TypeError(
             'Object is not serializable. Object must have a __serialize__ function.')
     return obj.__serialize__()
-
-
-class Category(db.Model):
-    __tablename__ = 'category'
-    name = db.Column(db.UnicodeText, primary_key=True)
-
-    def __serialize__(self):
-        return {
-            'name': self.name
-        }

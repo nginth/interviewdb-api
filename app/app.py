@@ -17,7 +17,11 @@ def create_app(config='config.json'):
 
     from .api.questions import questions_blueprint
     from .api.categories import categories_blueprint
+    from .api.hints import hints_blueprint
+    from .api.answers import answers_blueprint
     app.register_blueprint(questions_blueprint, url_prefix="/question")
     app.register_blueprint(categories_blueprint, url_prefix="/category")
+    app.register_blueprint(hints_blueprint, url_prefix="/hint")
+    app.register_blueprint(answers_blueprint, url_prefix="/answer")
 
     return app
