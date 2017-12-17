@@ -121,7 +121,7 @@ class TestQuestionAPI(TestCase):
 
     def test_update(self):
         response = self.client.put('/question/1', data=json.dumps(
-            dict(content='updated content')), content_type='application/json')
+            dict(content='updated content', name='updated name')), content_type='application/json')
         body = json.loads(response.data.decode('utf-8'))
         expected = {
             'message': 'Updated.',
@@ -131,13 +131,14 @@ class TestQuestionAPI(TestCase):
                 "content": "updated content",
                 "hints": [],
                 "id": 1,
-                "name": "trees are fun"
+                "name": "updated name"
             }
         }
         self.assertEqual(expected, body)
         self.assertEqual(200, response.status_code)
         q1 = Question.query.filter(Question.id == 1).first()
         self.assertEqual(q1.content, 'updated content')
+        self.assertEqual(q1.name, 'updated name')
 
 
 class TestHintAPI(TestCase):

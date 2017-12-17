@@ -4,6 +4,7 @@ from app.app import db
 from .util import (all_response,
                    specific_response,
                    post_response,
+                   put_response,
                    not_found,
                    bad_request)
 
@@ -22,25 +23,7 @@ def post_question():
 
 @questions_blueprint.route('/<int:question_id>', methods=['PUT'])
 def put_question(question_id):
-    question = Question.query.filter(Question.id == question_id).first()
-    if not question:
-        return not_found()
-    question_json = request.get_json()
-    if 'id' in question_json:
-        return bad_request('Cannot update id.')
-    for key in ('hints', 'categories', 'answers'):
-        if key in question_json:
-            return bad_request('Update of ' + key + 'not implemented.')
-    # TODO: figure out a better way to do this
-    question.name = question_json['name'] if 'name' in question_json else question.name
-    question.content = question_json['content'] if 'content' in question_json else question.content
-
-    db.session.add(question)
-    db.session.commit()
-    return jsonify({
-        'message': 'Updated.',
-        'question': serialize(question)
-    })
+    return put_response(Question, 'id', question_id, ('hints', 'categories', 'answers'))
 
 
 @questions_blueprint.route('/<int:question_id>', methods=['GET'])

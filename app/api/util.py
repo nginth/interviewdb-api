@@ -35,6 +35,34 @@ def post_response(from_json):
         return bad_request()
 
 
+def put_response(model, field, match, not_implemented=[]):
+    model_to_update = model.query.filter(
+        getattr(model, field) == match).first()
+    if not model_to_update:
+        return not_found()
+    update_json = request.get_json()
+    if 'id' in update_json:
+        return bad_request('Cannot update id.')
+
+    for key in not_implemented:
+        if key in update_json:
+            return bad_request('Update of ' +
+                               key +
+                               'not implemented. Use the endpoints respective to ' +
+                               key +
+                               ' to perform this operation.')
+
+    for key in update_json:
+        setattr(model_to_update, key, update_json[key])
+
+    db.session.add(model_to_update)
+    db.session.commit()
+    return jsonify({
+        'message': 'Updated.',
+        model.__name__.lower(): serialize(model_to_update)
+    })
+
+
 def not_found(message='Not found.'):
     response = jsonify({'message': message})
     response.status_code = 404
