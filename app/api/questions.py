@@ -1,6 +1,11 @@
-from flask import Blueprint
-from app.models import Question, Category
-from .util import all_response, specific_response, post_response
+from flask import Blueprint, jsonify, request
+from app.models import Question, Category, serialize
+from app.app import db
+from .util import (all_response,
+                   specific_response,
+                   post_response,
+                   not_found,
+                   bad_request)
 
 questions_blueprint = Blueprint('question', __name__)
 
@@ -13,6 +18,29 @@ def get_questions():
 @questions_blueprint.route('', methods=['POST'])
 def post_question():
     return post_response(question_from_json)
+
+
+@questions_blueprint.route('/<int:question_id>', methods=['PUT'])
+def put_question(question_id):
+    question = Question.query.filter(Question.id == question_id).first()
+    if not question:
+        return not_found()
+    question_json = request.get_json()
+    if 'id' in question_json:
+        return bad_request('Cannot update id.')
+    for key in ('hints', 'categories', 'answers'):
+        if key in question_json:
+            return bad_request('Update of ' + key + 'not implemented.')
+    # TODO: figure out a better way to do this
+    question.name = question_json['name'] if 'name' in question_json else question.name
+    question.content = question_json['content'] if 'content' in question_json else question.content
+
+    db.session.add(question)
+    db.session.commit()
+    return jsonify({
+        'message': 'Updated.',
+        'question': serialize(question)
+    })
 
 
 @questions_blueprint.route('/<int:question_id>', methods=['GET'])

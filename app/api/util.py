@@ -19,9 +19,7 @@ def all_response(model, model_name):
 def specific_response(model, field, match):
     specific_model = model.query.filter(getattr(model, field) == match).first()
     if not specific_model:
-        response = jsonify({'message': 'Not found.'})
-        response.status_code = 404
-        return response
+        return not_found()
     return jsonify(serialize(specific_model))
 
 
@@ -30,18 +28,27 @@ def post_response(from_json):
         new_model = from_json(request.get_json())
         db.session.add(new_model)
         db.session.commit()
-        response = jsonify({'message': 'Created.'})
-        response.status_code = 201
-        return response
+        return created()
     except KeyError as err:
-        print(err.args)
-        response = jsonify(
-            {'message': 'Bad request. Request must contain field: ' + err.args[0] + '.'})
-        response.status_code = 400
-        return response
+        return bad_request('Bad request. Request must contain field: ' + err.args[0] + '.')
     except IntegrityError as err:
-        print(err.args)
-        response = jsonify(
-            {'message': 'Bad request.'})
-        response.status_code = 400
-        return response
+        return bad_request()
+
+
+def not_found(message='Not found.'):
+    response = jsonify({'message': message})
+    response.status_code = 404
+    return response
+
+
+def bad_request(message='Bad request.'):
+    response = jsonify(
+        {'message': message})
+    response.status_code = 400
+    return response
+
+
+def created(message='Created.'):
+    response = jsonify({'message': message})
+    response.status_code = 201
+    return response
