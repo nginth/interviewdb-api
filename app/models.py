@@ -34,9 +34,7 @@ class Category(db.Model):
     name = db.Column(db.UnicodeText, primary_key=True)
 
     def __serialize__(self):
-        return {
-            'name': self.name
-        }
+        return {'name': self.name}
 
 
 class Answer(db.Model):
@@ -46,15 +44,17 @@ class Answer(db.Model):
     question_id = db.Column(db.Integer, db.ForeignKey('question.id'))
 
     def __serialize__(self):
-        return {
-            'id': self.id,
-            'content': self.content,
-            'question': self.question_id
-        }
+        return {'id': self.id, 'content': self.content, 'question': self.question_id}
 
 
-# class Language(db.Model):
-#     __tablename__ = 'language'
+class Language(db.Model):
+    __tablename__ = 'language'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.UnicodeText, nullable=False)
+    version = db.Column(db.UnicodeText, nullable=False)
+
+    def __serialize__(self):
+        return {'id': self.id, 'name': self.name, 'version': self.version}
 
 
 class Hint(db.Model):

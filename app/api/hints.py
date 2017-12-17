@@ -1,25 +1,13 @@
-from flask import Blueprint, request, jsonify
-from app.models import Question, Hint
-from app.app import db
+from flask import Blueprint
+from app.models import Hint
+from .util import post_response
 
 hints_blueprint = Blueprint('hint', __name__)
 
 
 @hints_blueprint.route('', methods=['POST'])
 def post_hint():
-    try:
-        new_hint = hint_from_json(request.get_json())
-        db.session.add(new_hint)
-        db.session.commit()
-        response = jsonify({'message': 'Created.'})
-        response.status_code = 201
-        return response
-    except KeyError as err:
-        print(err.args)
-        response = jsonify(
-            {'message': 'Bad request. Request must contain field: ' + err.args[0] + '.'})
-        response.status_code = 400
-        return response
+    return post_response(hint_from_json)
 
 
 def hint_from_json(json):
