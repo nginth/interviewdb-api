@@ -24,3 +24,16 @@ class Hint(db.Model):
         if not question:
             return not_found('Question with id ' + question_id + ' not found.')
         self.question = question
+
+    def update(self, **args):
+        if 'id' in args:
+            raise TypeError('Cannot update id.')
+
+        if 'content' in args:
+            self.content = args['content']
+        if 'order' in args:
+            self.order = args['order']
+        if 'questionId' in args:
+            self.set_question(args['questionId'])
+
+        return self

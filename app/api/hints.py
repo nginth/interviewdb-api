@@ -21,17 +21,7 @@ def update(hint_id):
     hint = Hint.query.filter(Hint.id == hint_id).first()
     if not hint:
         return not_found()
-    update_json = request.get_json()
-    if 'id' in update_json:
-        return bad_request('Cannot update id.')
-
-    if 'content' in update_json:
-        hint.content = update_json['content']
-    if 'order' in update_json:
-        hint.order = update_json['order']
-    if 'questionId' in update_json:
-        hint.set_question(update_json['questionId'])
-
+    hint.update(**request.get_json())
     db.session.add(hint)
     db.session.commit()
     return jsonify({
