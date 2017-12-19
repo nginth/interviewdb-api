@@ -159,10 +159,20 @@ class TestHintAPI(TestCase):
         q1 = Question()
         q1.name = 'question'
         q1.content = 'its a question'
-        db.session.add(q1)
+
+        q2 = Question()
+        q2.name = 'question 2'
+        q2.content = 'its a question 2'
+
+        h1 = Hint()
+        h1.order = 0
+        h1.content = 'hint'
+        h1.question_id = 1
+
+        db.session.add_all((q1, q2, h1))
         db.session.commit()
 
-        self.preexisting_hints = 0
+        self.preexisting_hints = 1
 
     def test_post(self):
         self.assertEqual(self.preexisting_hints, len(Hint.query.all()))
@@ -179,6 +189,30 @@ class TestHintAPI(TestCase):
         self.assertEqual(expected, body)
         self.assertEqual(201, response.status_code)
         self.assertEqual(self.preexisting_hints + 1, len(Hint.query.all()))
+
+    def test_update(self):
+        prev_hints = Question.query.filter(Question.id == 2).first().hints
+        update = {
+            'content': 'updated content',
+            'order': 2,
+            'questionId': 2
+        }
+        response = self.client.put(
+            '/hint/1', data=json.dumps(update), content_type='application/json')
+        body = json.loads(response.data.decode('utf-8'))
+        expected = {
+            'message': 'Updated.',
+            'hint': {
+                'content': 'updated content',
+                'order': 2,
+                'questionId': 2,
+                'id': 1
+            }
+        }
+        self.assertEqual(expected, body)
+        self.assertEqual(200, response.status_code)
+        hint_question = Question.query.filter(Question.id == 2).first()
+        self.assertEqual(len(prev_hints) + 1, len(hint_question.hints))
 
 
 class TestCategoryAPI(TestCase):

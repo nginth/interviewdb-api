@@ -15,7 +15,7 @@ class Question(db.Model):
     content = db.Column(db.UnicodeText, nullable=False)
     categories = db.relationship(
         'Category', secondary=questions_categories, backref='questions')
-    hints = db.relationship('Hint')
+    hints = db.relationship('Hint', backref='question')
     answers = db.relationship('Answer')
 
     def __serialize__(self):
@@ -69,8 +69,15 @@ class Hint(db.Model):
             'id': self.id,
             'order': self.order,
             'content': self.content,
-            'question': self.question_id
+            'questionId': self.question_id
         }
+
+    def set_question(self, question_id):
+        question = Question.query.filter(
+            Question.id == question_id).first()
+        if not question:
+            return not_found('Question with id ' + question_id + ' not found.')
+        self.question = question
 
 
 def serialize(obj):
