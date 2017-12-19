@@ -39,16 +39,6 @@ class Answer(db.Model):
         return {'id': self.id, 'content': self.content, 'question': self.question_id}
 
 
-class Language(db.Model):
-    __tablename__ = 'language'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.UnicodeText, nullable=False)
-    version = db.Column(db.UnicodeText, nullable=False)
-
-    def __serialize__(self):
-        return {'id': self.id, 'name': self.name, 'version': self.version}
-
-
 def serialize(obj):
     if obj is None:
         return jsonify(None)
@@ -61,3 +51,4 @@ def serialize(obj):
 
 from .model.Hint import Hint
 from .model.Category import Category
+from .model.Language import Language
