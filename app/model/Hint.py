@@ -1,5 +1,5 @@
 from app.app import db
-from app.models import Question
+from .Question import Question
 from app.api.util import not_found
 
 
