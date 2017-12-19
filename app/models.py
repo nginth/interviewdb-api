@@ -57,29 +57,6 @@ class Language(db.Model):
         return {'id': self.id, 'name': self.name, 'version': self.version}
 
 
-class Hint(db.Model):
-    __tablename__ = 'hint'
-    id = db.Column(db.Integer, primary_key=True)
-    order = db.Column(db.Integer, nullable=False)
-    content = db.Column(db.UnicodeText, nullable=False)
-    question_id = db.Column(db.Integer, db.ForeignKey('question.id'))
-
-    def __serialize__(self):
-        return {
-            'id': self.id,
-            'order': self.order,
-            'content': self.content,
-            'questionId': self.question_id
-        }
-
-    def set_question(self, question_id):
-        question = Question.query.filter(
-            Question.id == question_id).first()
-        if not question:
-            return not_found('Question with id ' + question_id + ' not found.')
-        self.question = question
-
-
 def serialize(obj):
     if obj is None:
         return jsonify(None)
@@ -88,3 +65,6 @@ def serialize(obj):
         raise TypeError(
             'Object is not serializable. Object must have a __serialize__ function.')
     return obj.__serialize__()
+
+
+from .model.Hint import Hint
