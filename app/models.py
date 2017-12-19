@@ -29,14 +29,6 @@ class Question(db.Model):
         }
 
 
-class Category(db.Model):
-    __tablename__ = 'category'
-    name = db.Column(db.UnicodeText, primary_key=True)
-
-    def __serialize__(self):
-        return {'name': self.name}
-
-
 class Answer(db.Model):
     __tablename__ = 'answer'
     id = db.Column(db.Integer, primary_key=True)
@@ -68,3 +60,4 @@ def serialize(obj):
 
 
 from .model.Hint import Hint
+from .model.Category import Category
