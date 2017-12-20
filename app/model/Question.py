@@ -12,6 +12,11 @@ class Question(db.Model):
     hints = db.relationship('Hint', backref='question')
     answers = db.relationship('Answer')
 
+    def update(self, **args):
+        for key in args:
+            setattr(self, key, args[key])
+        return self
+
     def __serialize__(self):
         return {
             'id': self.id,

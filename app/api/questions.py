@@ -22,8 +22,30 @@ def post_question():
 
 
 @questions_blueprint.route('/<int:question_id>', methods=['PUT'])
-def put_question(question_id):
-    return put_response(Question, 'id', question_id, ('hints', 'categories', 'answers'))
+def update(question_id):
+    question = Question.query.filter(Question.id == question_id).first()
+    if not question:
+        return not_found()
+    update_json = request.get_json()
+
+    if 'id' in update_json:
+        return bad_request('Cannot update id.')
+    for key in ('hints', 'categories', 'answers'):
+        if key in update_json:
+            return bad_request('Update of ' +
+                               key +
+                               'not implemented. Use the endpoints respective to ' +
+                               key +
+                               ' to perform this operation.')
+
+    question.update(**update_json)
+    db.session.add(question)
+    db.session.commit()
+    return jsonify({
+        'message': 'Updated.',
+        'question': serialize(question)
+    })
+    # return put_response(Question, 'id', question_id, )
 
 
 @questions_blueprint.route('/<int:question_id>', methods=['GET'])
