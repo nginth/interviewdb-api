@@ -140,6 +140,33 @@ class TestQuestionAPI(TestCase):
         self.assertEqual(q1.content, 'updated content')
         self.assertEqual(q1.name, 'updated name')
 
+    def test_update_fail_id(self):
+        response = self.client.put('/question/1', data=json.dumps(
+            dict(id=7, name='updated name')), content_type='application/json')
+        body = json.loads(response.data.decode('utf-8'))
+        expected = {
+            'message': 'Cannot update id.'
+        }
+        self.assertEqual(expected, body)
+        self.assertEqual(400, response.status_code)
+
+    def test_update_fail_unimplemented(self):
+        for key in ('answers', 'categories', 'hints'):
+            response = self.client.put('/question/1',
+                                       data=json.dumps(
+                                           {key: ['a', 'b'], 'content': 'asdfs'}),
+                                       content_type='application/json')
+            body = json.loads(response.data.decode('utf-8'))
+            expected = {
+                'message': 'Update of ' +
+                key +
+                'not implemented. Use the endpoints respective to ' +
+                key +
+                ' to perform this operation.'
+            }
+            self.assertEqual(expected, body)
+            self.assertEqual(400, response.status_code)
+
 
 class TestHintAPI(TestCase):
     def create_app(self):

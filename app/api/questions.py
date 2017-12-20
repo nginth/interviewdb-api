@@ -28,15 +28,12 @@ def update(question_id):
         return not_found()
     update_json = request.get_json()
 
-    if 'id' in update_json:
-        return bad_request('Cannot update id.')
-    for key in ('hints', 'categories', 'answers'):
-        if key in update_json:
-            return bad_request('Update of ' +
-                               key +
-                               'not implemented. Use the endpoints respective to ' +
-                               key +
-                               ' to perform this operation.')
+    # TODO: determine if it's better to use an exception flow here
+
+    try:
+        validate_json(update_json)
+    except (InvalidUpdateFieldError, IdUpdateError) as err:
+        return bad_request(err.args[0])
 
     question.update(**update_json)
     db.session.add(question)
@@ -65,3 +62,23 @@ def categories_from_json(json):
     if 'categories' not in json:
         return []
     return Category.query.filter(Category.name.in_(json['categories'])).all()
+
+
+def validate_json(update_json):
+    if 'id' in update_json:
+        raise IdUpdateError('Cannot update id.')
+    for key in ('hints', 'categories', 'answers'):
+        if key in update_json:
+            raise InvalidUpdateFieldError('Update of ' +
+                                          key +
+                                          'not implemented. Use the endpoints respective to ' +
+                                          key +
+                                          ' to perform this operation.')
+
+
+class IdUpdateError(Exception):
+    pass
+
+
+class InvalidUpdateFieldError(Exception):
+    pass
